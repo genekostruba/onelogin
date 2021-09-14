@@ -1,0 +1,400 @@
+=================================================================
+Project Summary
+=================================================================
+
+Write a command line program in the language of your choice [Java chosen] that will take
+operations on fractions as an input and produce a fractional result.
+
+* Legal operators shall be *, /, +, - (multiply, divide, add, subtract)
+* Operands and operators shall be separated by one or more spaces
+* Mixed numbers will be represented by whole_numerator/denominator. e.g. "3_1/4"
+* Improper fractions and whole numbers are also allowed as operands.
+* Examples:
+
+? 1/2 * 3_3/4
+= 1_7/8
+? 2_3/8 + 9/8
+3_1/2
+
+
+* Assumptions I made:
+*
+* The input arguments are properly formatted.  There are two unsigned operands, separated by
+* the operator, with one or more spaces separating the operator from each operand.  Each operand
+* is in one of the following 3 formats:
+*
+*     whole
+*     numerator/denominator
+*     whole_numerator/denominator
+*
+* where whole, numerator, and denominator are digits, and there is no embedded whitespace.
+* A negative result from the operation is possible if the operation is a subtraction, and
+* the second operand is larger than the first operand.
+*
+* Errors are thrown if:
+*
+* - there are not exactly 3 arguments, proper format is:
+*
+*           > java FractionOperation operand1 operator operand2
+*
+* - whole, numerator, and denominator are not all digits
+* - denominator is zero
+* - operator is not one of * / + -
+*
+* Note that if * is the desired operator, it must be specified in double quotes on the command
+* line, not to be treated as a file wildcard character:
+*
+* Incorrect:  > java FractionOperation 1_1/2 * 3_3/4
+* Correct:    > java FractionOperation 1_1/2 "*" 3_3/4 
+
+
+=================================================================
+Build and Run the Executable
+=================================================================
+
+All files are in my GitHub repository:  
+
+The source file is FractionOperation.java.  To compile and execute it, you will need to have Java
+installed on your local machine.  To download the latest Java version:
+
+-   Download latest jdk zip from http://www.oracle.com/technetwork/java/javase/downloads/index.html
+    eg, jdk-17_windows-x64_bin.zip
+-   Unzip to C:\
+    eg, C:\jdk-17
+-   Edit System env var Path to point to new bin directory
+    eg, C:\jdk-17\bin;
+
+Compiling the source and running individual test cases does not need to be done on Windows,
+but the test script (.ps1 file extension) to run all the tests (TestData.csv) is coded as a Windows
+PowerShell script.  The test script was developed and run on PowerShell version 5.1 on Windows 10:
+
+PS C:\> $PSVersionTable.PSVersion
+
+Major  Minor  Build  Revision
+-----  -----  -----  --------
+5      1      19041  1151
+
+Before you can run a script in PowerShell on your machine, you must launch a PowerShell window
+as Administrator, and run the following command:
+
+    > Set-ExecutionPolicy RemoteSigned
+	
+Any PowerShell window you launch moving forward (does not need to be Administrator) can now
+run scripts.
+
+The test cases are coded in the file TestData.csv as comma-separated values.  PowerShell provides
+a simple built-in command to read CSV files.
+
+Here are the complete steps on your local Windows machine:
+
+* Create a test directory on your local Windows machine
+* From my GitHub repository, download the following files to the test directory:
+
+  - FractionOperation.java
+  - TestFractionOperationCsv.ps1
+  - TestData.csv
+
+* Open PowerShell on your local Windows machine
+* cd to your test directory  
+* Compile:
+
+  > javac FractionOperation.java
+  
+* Execute single test cases:
+
+  > java FractionOperation operand1 operator operand2
+  
+* Execute all test cases:
+
+  > .\TestFractionOperation.ps1
+
+
+=================================================================
+Test Cases
+=================================================================
+
+Test cases to achieve 100% line coverage
+----------------------------------------
+
+Input								Result
+
+<no arguments>						Improper number of arguments 0, expecting 'operand1 operator operand2'
+
+1/2a + 3/4							Input part '2a' is not a number
+
+1_1/2 "*" 2_3/4						4_1/8
+
+1/2 / 3/0							Denominator of fraction is zero
+
+1/2 / 3/4							2/3
+
+3 / 0/4								Operation is division and second operand is zero
+
+3 + 4								7
+
+0_1/2 - 3/4							-1/4
+
+1/2 - 1_3/4							-1_1/4
+
+1/2 - 1/2							0
+
+3 % 2								Invalid operator '%', expecting one of * / + -
+
+General test cases
+------------------
+
+Both operands zero
+
+0 "*" 0								0
+
+0 / 0								Operation is division and second operand is zero
+
+0 + 0								0
+
+0 - 0								0
+
+0/2 "*" 0/5							0
+
+0/2 / 0/5							Operation is division and second operand is zero
+
+0/2 + 0/5							0
+
+0/2 - 0/5							0
+
+0_0/2 "*" 0_0/5						0
+
+0_0/2 / 0_0/5						Operation is division and second operand is zero
+
+0_0/2 + 0_0/5						0
+
+0_0/2 - 0_0/5						0
+
+Either operand zero
+
+5 "*" 0								0
+
+5 / 0								Operation is division and second operand is zero
+
+5 + 0								5
+
+5 - 0								5
+
+5_1/2 "*" 0/3						0
+
+5_1/2 / 0/3							Operation is division and second operand is zero
+
+5_1/2 + 0/3							5_1/2
+
+5_1/2 - 0/3							5_1/2
+
+5_1/2 "*" 0_0/3						0
+
+5_1/2 / 0_0/3						Operation is division and second operand is zero
+
+5_1/2 + 0_0/3						5_1/2
+
+5_1/2 - 0_0/3						5_1/2
+
+0 "*" 5								0
+
+0 / 5								0
+
+0 + 5								5
+
+0 - 5								-5
+
+0/3 "*" 5_1/2						0
+
+0/3 / 5_1/2							0
+
+0/3 + 5_1/2							5_1/2
+
+0/3 - 5_1/2							-5_1/2
+
+0_0/3 "*" 5_1/2						0
+
+0_0/3 / 5_1/2						0
+
+0_0/3 + 5_1/2						5_1/2
+
+0_0/3 - 5_1/2						-5_1/2
+
+Both operands non-zero
+
+3 "*" 5								15
+
+3 / 5								3/5
+
+3 + 5								8
+
+3 - 5								-2
+
+0_1/2 "*" 1/4						1/8
+
+0_1/2 / 1/4							2
+
+0_1/2 + 1/4							3/4
+
+0_1/2 - 1/4							1/4
+
+1/4 "*" 0_1/2						1/8
+
+1/4 / 0_1/2							1/2
+
+1/4 + 0_1/2							3/4
+
+1/4 - 0_1/2							-1/4
+
+1/2 "*" 1/2							1/4
+
+1/2 / 1/2							1
+
+1/2 + 1/2							1
+
+1/2 - 1/2							0
+
+3_1/2 "*" 5_1/3						18_2/3
+
+3_1/2 / 5_1/3						21/32
+
+3_1/2 + 5_1/3						8_5/6
+
+3_1/2 - 5_1/3						-1_5/6
+
+Improper fractions
+
+7/4 "*" 11/9						2_5/36
+
+7/4 / 11/9							1_19/44
+
+7/4 + 11/9							2_35/36
+
+7/4 - 11/9							19/36
+
+2_7/4 "*" 3_11/9					15_5/6
+
+2_7/4 / 3_11/9						135/152
+
+2_7/4 + 3_11/9						7_35/36
+
+2_7/4 - 3_11/9						-17/36
+
+Large numbers
+
+12345 "*" 67890						838102050
+
+12345 / 67890						823/4526
+
+12345 + 67890						80235
+
+12345 - 67890						-55545		
+
+Handling 0 operands
+-------------------
+
+When I parse the command-line operands, I allow zero in the whole part and/or the numerator of
+the fractional part.  A zero in the fractional denominator throws an error.
+
+I convert the input operands to computational fractions, by computing:
+
+    (whole * denominator + numerator) / denominator
+
+In so doing, I handle zeroes as:
+
+    1) if there is only a fractional part, the computational fraction keeps the original denominator
+	2) if there is only a zero whole part, the computational fraction is 0/1
+	3) if there are both whole and fractional parts, a zero whole part is ignored, and a zero in the
+	   fractional numerator contributes nothing to the computational fraction, computed as above
+
+Thus (1) and (2) can result in a zero in the computational fraction numerator.  This only causes
+an issue when it occurs in the second operand and the operation is division.  This condition is
+checked, and throws a fatal error.
+
+Overflow and Underflow
+----------------------
+
+The program is currently coded using signed 32-bit integers (Java "int" data type, having values between
+-2147483648 and 2147483647).  Larger numbers will cause positive overflow or negative underflow.  Normally
+Java does not throw exceptions in this case, and the values resulting from the operation wrap-around within
+32 bits.  If such larger numbers need to be handled, one or both of the following approaches can be used:
+
+- change the "int" data type to the Java "long" data type, where the range of a long (64-bit) integer is
+  -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
+  
+- perform the operations with the Java Math class exact methods:
+
+  - Math.addExact(int, int) or Math.addExact(long, long)
+  - Math.multipleExact(int, int) or Math.multipleExact(long, long)
+  - Math.subtractExact(int, int) or Math.subtractExact(long, long)
+  
+  These Math methods perform the operation, and throw an ArithmeticException on overflow or underflow.
+  
+Test Driver
+-----------
+
+I wrote a PowerShell test script (TestFractionOperation.ps1) to execute and verify all the tests above.
+The test data is read from a CSV file (TestData.csv).
+
+Performance
+-----------
+
+I don't think the app, in its simple command-line form, has any performance issues.  As a core
+computational component, a simple API could be built for it, so that other applications could
+employ the program's functionality.  In this case, maximum performance of the program could be
+an issue, if required to perform millions of operations per second.  In this case, Java could
+use Ahead-of-time (AOT) compilation, or the program could be reimplemented in C, which is
+normally used for execution-time-critical components.
+
+Execution-time code size will marginally increase if the Overflow/Underflow approaches above
+are used.
+
+Security
+--------
+
+When deployed and accessed on a desktop or local device, the main security issue would be
+interference with the program's computational correctness.  This corruption could be
+precipitated by malware on the device hosting the program.  If the program were used over a
+network, it would be susceptible to standard network attacks, which could be mitigated by
+encrypting all data to and from the program, for example, using SSH. 
+
+If the program were deployed in the cloud (container or EC2 instance), malware attacks would
+depend on the VPC security policies and settings.  Data transmission to and from the cloud
+would still be susceptible to network attacks, and can be encrypted using SSH.
+
+
+=================================================================
+Deployment
+=================================================================
+
+Without any specific use cases outlined for this program, it can be considered a general utility,
+like a command-line calculator.  It is written in Java, and unless Ahead-of-time (AOT) compilation
+is used, requires a Java runtime (JVM).  A JVM may limit deployment scenarios to machines that have
+sufficient memory for the JVM.  The program could be adapted to smart phones and tablets with a
+proper UI, using AOT, or using Just-in-time (JIT) compilation if there are enough resources on the
+device to support a JVM.  Of course, mobile devices and tablets already have sophisticated calculator
+apps available.
+
+The program could be deployed in a cloud container, or even an EC2 instance, and make a command-line
+interface available to on-prem or mobile/IoT users.  Cloud deployment would simplify maintenance
+and enhancement of the program.  If it were deployed on specific on-prem (non-cloud) devices,
+users would have to perform their own upgrades, and several versions of the program would most
+likely need to be supported.
+
+
+=================================================================
+Maintenance
+=================================================================
+
+In its initial form, the program requires very little or no maintenance.  If the overflow and underflow
+checking techniques described above were implemented, additional large number test cases should be added
+to check that the ArithmeticException is handled, for example:
+
+12_1234567890/67890 "*" 67_6789012345/12345			10008386594_796210/1862449
+12_123451234567890/67890 "*" 67_6789012345/12345	Multiply operation overflow
+
+The program was compiled and run with JDK 17 (AKA Java 17).  Java major releases are now on a 6-month
+release cadence, with Java 17 being the latest as of 9/14/21.  The program does not use extended Java
+features or classes, but should be recompiled and tested on each new Java version.
+
+The test script was developed and run on PowerShell version 5.1 on Windows 10.  The test script should
+run in newer PowerShell versions.
